@@ -24,7 +24,7 @@ func parseFile(filename string) []string {
 
 func main() {
 
-	dataCalories := parseFile("../input/day01.txt")
+	dataCalories := parseFile("../../input/day01.txt")
 
 	localSums := []int{}
 	localSum := 0
