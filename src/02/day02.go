@@ -13,20 +13,21 @@ func parseFile(filename string) []string {
 	return strings.Split(stringData, "\r\n")
 }
 
-func calculatePickPoints(pick string) int {
+func part1Fast(data []string) int {
 
-	if pick == "X" {
-		return 1
-	} else if pick == "Y" {
-		return 2
-	} else if pick == "Z" {
-		return 3
-	} else {
-		panic("Things went wrong")
+	var totalScore int = 0
+	scoringPairs := map[string]int{
+		"A X": 4, "A Y": 8, "A Z": 3,
+		"B X": 1, "B Y": 5, "C Z": 6,
+		"C X": 7, "C Y": 2, "B Z": 9}
+
+	for _, pair := range data {
+		totalScore += scoringPairs[pair]
 	}
+	return totalScore
 }
 
-func part2(data []string) {
+func part2(data []string) int {
 
 	var totalScorePart int = 0
 
@@ -102,59 +103,27 @@ func part2(data []string) {
 
 	}
 
-	fmt.Printf("Part 2: %v\n", totalScorePart)
+	return totalScorePart
 
+}
+
+func calculatePickPoints(pick string) int {
+
+	if pick == "X" {
+		return 1
+	} else if pick == "Y" {
+		return 2
+	} else if pick == "Z" {
+		return 3
+	} else {
+		panic("Things went wrong")
+	}
 }
 
 func main() {
 
 	data := parseFile("../../input/day02.txt")
-
-	part2(data)
-
-	os.Exit(0)
-
-	var totalScorePart int = 0
-
-	for _, pair := range data {
-		var localScore int = 0
-
-		picks := strings.Split(pair, " ")
-
-		opponentPick := picks[0]
-		myPick := picks[1]
-
-		// Step 1 : Bonus points
-		pickPoints := calculatePickPoints(myPick)
-		localScore += pickPoints
-
-		// Step 2 : Part 1 Win condition Resolution
-		var winCondition bool = myPick == "X" && opponentPick == "C" ||
-			myPick == "Y" && opponentPick == "A" ||
-			myPick == "Z" && opponentPick == "B"
-
-		var drawCondition bool = myPick == "X" && opponentPick == "A" ||
-			myPick == "Y" && opponentPick == "B" ||
-			myPick == "Z" && opponentPick == "C"
-
-		var lossCondition bool = myPick == "X" && opponentPick == "B" ||
-			myPick == "Y" && opponentPick == "C" ||
-			myPick == "Z" && opponentPick == "A"
-
-		// Step 3 : Award points :
-		if winCondition {
-			localScore += 6
-		} else if drawCondition {
-			localScore += 3
-		} else if lossCondition {
-		} else {
-			panic("Something went wrong")
-		}
-
-		totalScorePart += localScore
-
-	}
-
-	fmt.Printf("Part 1 Total Score: %v\n", totalScorePart)
+	fmt.Printf("Part 1 Score : %v\n", part1Fast(data))
+	fmt.Printf("Part 2 Score : %v\n", part2(data))
 
 }
