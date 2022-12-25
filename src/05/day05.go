@@ -14,14 +14,15 @@ func parseFile(filename string) []string {
 	return strings.Split(stringData, "\r\n")
 }
 
+// TODO : we might need to have the default value as -1
 type stack struct {
 	elements []string
 	top      int
-} // TODO : we might need to have the default value as -1
+}
 
 func main() {
 
-	data := parseFile("../../input/test/day05.txt")
+	data := parseFile("../../input/day05.txt")
 
 	var stackData []string
 	var moveData []string
@@ -47,19 +48,21 @@ func main() {
 	numberOfStacks, _ := strconv.Atoi(results[len(results)-1])
 
 	fmt.Printf("We want to create %v stacks \n", numberOfStacks)
-	// Create a list of lists of 9 elements
 
+	// Dynamic size list : slice. Create list of n stacks.
 	var stacks = make([]stack, numberOfStacks)
 
+	// To properly parse the input
 	var step int = 4
 
+	// Parse the input in reverse to fill the stacks
 	for i := len(stackData) - 2; i >= 0; i-- {
 		for j := 1; j < len(stackData[i]); j += step {
 			character := stackData[i][j]
 
 			if character != 32 { // whitespace
-				fmt.Printf("Trying to add %v to stack %v\n", string(character), j/step+1)
 
+				// fmt.Printf("Trying to add %v to stack %v\n", string(character), j/step+1)
 				push(&stacks[j/step], string(character))
 
 			}
@@ -71,9 +74,42 @@ func main() {
 
 		// Loop through the contents of the stack
 		for j := 0; j < len(stacks[i].elements); j++ {
-			fmt.Printf("At stack %v there element : %v\n", i, stacks[i].elements[j])
+			// fmt.Printf("At stack %v -> element %v\n", i, stacks[i].elements[j])
 		}
 	}
+
+	// Part 2 : Parse the move data :
+
+	for i := 0; i < len(moveData); i++ {
+		// fmt.Printf("moveData[i]: %v\n", moveData[i])
+
+		result := strings.Split(moveData[i], " ")
+
+		amount, _ := strconv.Atoi(result[1])
+		source, _ := strconv.Atoi(result[3])
+		target, _ := strconv.Atoi(result[5])
+
+		source -= 1
+		target -= 1
+
+		for j := 1; j <= amount; j++ {
+			stackPop := pop(&stacks[source])
+			push(&stacks[target], stackPop)
+		}
+
+	}
+
+	var finalString string = ""
+
+	for i := 0; i < len(stacks); i++ {
+
+		top := len(stacks[i].elements) - 1
+		// fmt.Printf("stacks[i].elements[top]: %v\n", stacks[i].elements[top])
+
+		finalString += stacks[i].elements[top]
+	}
+
+	fmt.Printf("finalString: %v\n", finalString)
 
 }
 
