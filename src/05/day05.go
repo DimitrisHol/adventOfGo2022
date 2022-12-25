@@ -14,7 +14,6 @@ func parseFile(filename string) []string {
 	return strings.Split(stringData, "\r\n")
 }
 
-// TODO : we might need to have the default value as -1
 type stack struct {
 	elements []string
 	top      int
@@ -44,10 +43,8 @@ func main() {
 
 	}
 
-	results := strings.Split(strings.TrimSpace(stackData[len(stackData)-1]), "   ")
-	numberOfStacks, _ := strconv.Atoi(results[len(results)-1])
-
-	fmt.Printf("We want to create %v stacks \n", numberOfStacks)
+	lastStackLine := strings.Split(strings.TrimSpace(stackData[len(stackData)-1]), "   ")
+	numberOfStacks, _ := strconv.Atoi(lastStackLine[len(lastStackLine)-1])
 
 	// Dynamic size list : slice. Create list of n stacks.
 	var stacks = make([]stack, numberOfStacks)
@@ -55,7 +52,7 @@ func main() {
 	// To properly parse the input
 	var step int = 4
 
-	// Parse the input in reverse to fill the stacks
+	// Parse the stack input in reverse to fill the stacks
 	for i := len(stackData) - 2; i >= 0; i-- {
 		for j := 1; j < len(stackData[i]); j += step {
 			character := stackData[i][j]
@@ -69,19 +66,8 @@ func main() {
 		}
 	}
 
-	// Loop through all the stacks :
-	for i := 0; i < len(stacks); i++ {
-
-		// Loop through the contents of the stack
-		for j := 0; j < len(stacks[i].elements); j++ {
-			// fmt.Printf("At stack %v -> element %v\n", i, stacks[i].elements[j])
-		}
-	}
-
-	// Part 2 : Parse the move data :
-
+	// Parsing the move data :
 	for i := 0; i < len(moveData); i++ {
-		// fmt.Printf("moveData[i]: %v\n", moveData[i])
 
 		result := strings.Split(moveData[i], " ")
 
@@ -89,27 +75,39 @@ func main() {
 		source, _ := strconv.Atoi(result[3])
 		target, _ := strconv.Atoi(result[5])
 
-		source -= 1
-		target -= 1
+		source -= 1 // correct index
+		target -= 1 // correct index
 
+		// // Part 1 : Individual moving
+		// for j := 1; j <= amount; j++ {
+		// 	stackPop := pop(&stacks[source])
+		// 	push(&stacks[target], stackPop)
+		// }
+
+		// Part 2 : Multiple items at a time :
+
+		// 1. Pop the items and add them to a list
+		var tempSlice []string
 		for j := 1; j <= amount; j++ {
 			stackPop := pop(&stacks[source])
-			push(&stacks[target], stackPop)
+			tempSlice = append(tempSlice, stackPop)
+		}
+
+		// 2. Reading in reverse, push them to the target stack
+		for j := len(tempSlice) - 1; j >= 0; j-- {
+			push(&stacks[target], tempSlice[j])
 		}
 
 	}
 
-	var finalString string = ""
+	var resultString string = ""
 
 	for i := 0; i < len(stacks); i++ {
-
 		top := len(stacks[i].elements) - 1
-		// fmt.Printf("stacks[i].elements[top]: %v\n", stacks[i].elements[top])
-
-		finalString += stacks[i].elements[top]
+		resultString += stacks[i].elements[top]
 	}
 
-	fmt.Printf("finalString: %v\n", finalString)
+	fmt.Printf("resultString: %v\n", resultString)
 
 }
 
@@ -120,8 +118,7 @@ func push(stackToUpdate *stack, value string) {
 func pop(stackToUpdate *stack) string {
 
 	if len(stackToUpdate.elements) == 0 {
-		println("There is nothing to pop")
-		return ""
+		panic("Trying to pop element from stack but there is nothing left to pop!")
 	}
 
 	stackLength := len(stackToUpdate.elements)
